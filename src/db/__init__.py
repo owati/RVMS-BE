@@ -1,4 +1,5 @@
+import os
 from pymongo import MongoClient
 
 def db():
-    return MongoClient()['rvms-test']
+    return MongoClient(os.getenv('MONG0_URL'))['rvms-test']
