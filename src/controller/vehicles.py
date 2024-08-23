@@ -53,7 +53,7 @@ def vehicle_controller_factory(socketio : SocketIO, redis_client : Redis):
             if not journey_id:
                 # Probably a new journey 😁
                 journey = JourneyData(
-                    vehicle_id=ObjectId(vehicle_id),
+                    vehicle_id=vehicle_id,
                     start_time=current_time,
                     end_time=current_time
                 ).create()
