@@ -11,6 +11,8 @@ class MonitoringData(BaseModel):
     journey_id : Annotated[ObjectId, ObjectIdAnnotation]
     longitude : float
     lattitude : float
+    fuelLevel : float
+    speed : float
 
     def create(self):
         doc = self.model_dump()
@@ -30,3 +32,34 @@ class MonitoringData(BaseModel):
 
         return data
     
+    @staticmethod
+    def aggregate_for_journey(journey_id):
+        data = db.aggregate([
+            {
+                '$match': {
+                    'journey_id': ObjectId(journey_id)
+                }
+            }, {
+                '$group': {
+                    '_id': None, 
+                    'avg_fuel_level': {
+                        '$avg': '$fuelLevel'
+                    }, 
+                    'avg_speed': {
+                        '$avg': '$speed'
+                    }, 
+                    'count': {
+                        '$count': {}
+                    }
+                }
+            }
+        ])
+        
+        return list(data)
+    
+    @staticmethod
+    def get_full_data_for_journey(journey_id):
+        data = db.find({
+            "journey_id" : ObjectId(journey_id)
+        })
+        return [MonitoringData(**datum).model_dump() for datum in data]

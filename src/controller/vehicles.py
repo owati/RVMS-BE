@@ -99,7 +99,31 @@ def vehicle_controller_factory(socketio : SocketIO, redis_client : Redis):
         except:
             traceback.print_exc()
             return jsonify({"message" : "Something is wrong"}), 400
-          
+        
     
+    @vehicles_controller.get('/journey-data/<string:journey_id>')
+    def get_journey_data(journey_id):
+        try:
+            agg_data = MonitoringData.aggregate_for_journey(journey_id)
+            return jsonify({
+                "message" : "Fetched successfully",
+                "data" : agg_data
+            })
+        except:
+            traceback.print_exc()
+            return jsonify({"message" : "Something is wrong"}), 400
+          
+    @vehicles_controller.get('/journey-data-full/<string:journey_id>')
+    def get_journey_data_full(journey_id):
+        try:
+            data = MonitoringData.get_full_data_for_journey(journey_id)
+            return jsonify({
+                "message" : "Fetched successfully",
+                "data" : data
+            })
+        except:
+            traceback.print_exc()
+            return jsonify({"message" : "Something is wrong"}), 400
+          
         
     return vehicles_controller
