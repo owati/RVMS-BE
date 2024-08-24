@@ -1,6 +1,5 @@
 import json
 import traceback
-import threading
 from datetime import datetime
 from redis import Redis
 from flask_socketio import SocketIO
@@ -65,9 +64,7 @@ def vehicle_controller_factory(socketio : SocketIO, redis_client : Redis):
             data = MonitoringData.parse_data(json.loads(request.data))
             data['journey_id'] = ObjectId(journey_id)
             monitorind_data = MonitoringData(**data).create()
-            thread = threading.Thread(target=lambda : socketio.emit('data', 
-                                                                    monitorind_data.model_dump()))
-            thread.start()
+            socketio.emit('data', monitorind_data.model_dump())
             redis_client.expire(vehicle_id, 1_800, xx=True)
             JourneyData.update_end_time(journey_id, current_time)
             
